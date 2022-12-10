@@ -1,6 +1,24 @@
 # telescope-insert-path.nvim
 
 Set of [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) actions to insert file path on the current buffer.
+It supports inserting at different locations, and leaving in insert / normal / visual mode.
+
+
+### Supported Locations
+- `i`: before cursor
+- `a`: after cursor
+- `I`: beginning of the line
+- `A`: end of the line
+- `o`: new line after
+- `O`: new line before
+
+### Supported Vim Modes
+After inserting the path on your file, it can be in any modes:
+- Insert
+- Normal
+- Visual mode with the path selected
+
+## Installation
 
 Install using vim-plug:
 ```vim
