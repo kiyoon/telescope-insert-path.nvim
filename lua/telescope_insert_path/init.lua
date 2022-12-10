@@ -13,17 +13,34 @@ local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 
 local insert_path = function(prompt_bufnr, relative, location, vim_mode)
+  local picker = action_state.get_current_picker(prompt_bufnr)
+
   actions.close(prompt_bufnr)
 
-  -- TODO: get all selections by using
-  -- local picker = action_state.get_current_picker(prompt_bufnr)
-  --print(vim.inspect(picker._multi._entries))
-  --print(vim.inspect(picker._selection_entry))
   local entry = action_state.get_selected_entry(prompt_bufnr)
-  local filename = entry.value
-  if not relative then
-  -- fnamemodify with :p appends a trailing slash to directories
-    filename = vim.fn.fnamemodify(entry.cwd, ':p') .. filename
+
+  -- local from_entry = require "telescope.from_entry"
+  -- local filename = from_entry.path(entry)
+  local filename
+  if relative then
+    filename = entry.filename
+  else
+    filename = entry.path
+  end
+
+  local selections = {}
+  for _, selection in ipairs(picker:get_multi_selection()) do
+    print(selection)
+    local selection_filename
+    if relative then
+      selection_filename = selection.filename
+    else
+      selection_filename = selection.path
+    end
+
+    if selection_filename ~= filename then
+      table.insert(selections, selection_filename)
+    end
   end
 
   -- normal mode
@@ -72,6 +89,16 @@ local insert_path = function(prompt_bufnr, relative, location, vim_mode)
   -- put the rest of the filename
   if filename:len() > 1 then
     vim.api.nvim_put({ filename:sub(2) }, "", true, true)
+    if trailing_content then
+      vim.cmd([[normal! h]])
+    end
+  end
+
+  -- put the selections
+  if #selections > 0 then
+    -- start with empty line
+    table.insert(selections, 1, "")
+    vim.api.nvim_put(selections, "", true, true)
   else
     -- make the cursor consistent
     if trailing_content then
