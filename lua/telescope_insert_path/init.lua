@@ -3,6 +3,12 @@ if not tele_status_ok then
 	return
 end
 
+local path_actions = setmetatable({}, {
+  __index = function(_, k)
+    error("Key does not exist for 'telescope_insert_path': " .. tostring(k))
+  end,
+})
+
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 
@@ -35,26 +41,28 @@ local insert_path = function(prompt_bufnr, close, location, vim_mode)
   end
 end
 
-local insert_path_i = function(prompt_bufnr)
+path_actions.insert_path_i = function(prompt_bufnr)
   return insert_path(prompt_bufnr, true, "i", nil)
 end
 
-local insert_path_I = function(prompt_bufnr)
+path_actions.insert_path_I = function(prompt_bufnr)
   return insert_path(prompt_bufnr, true, "I", nil)
 end
 
-local insert_path_a = function(prompt_bufnr)
+path_actions.insert_path_a = function(prompt_bufnr)
   return insert_path(prompt_bufnr, true, "a", nil)
 end
 
-local insert_path_A = function(prompt_bufnr)
+path_actions.insert_path_A = function(prompt_bufnr)
   return insert_path(prompt_bufnr, true, "A", nil)
 end
 
-local insert_path_o = function(prompt_bufnr)
+path_actions.insert_path_o = function(prompt_bufnr)
   return insert_path(prompt_bufnr, true, "o", nil)
 end
 
-local insert_path_O = function(prompt_bufnr)
+path_actions.insert_path_O = function(prompt_bufnr)
   return insert_path(prompt_bufnr, true, "O", nil)
 end
+
+return path_actions
