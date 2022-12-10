@@ -12,10 +12,8 @@ local path_actions = setmetatable({}, {
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 
-local insert_path = function(prompt_bufnr, close, location, vim_mode)
-  if close then
-    actions.close(prompt_bufnr)
-  end
+local insert_path = function(prompt_bufnr, relative, location, vim_mode)
+  actions.close(prompt_bufnr)
 
   -- TODO: get all selections by using
   -- local picker = action_state.get_current_picker(prompt_bufnr)
@@ -23,46 +21,223 @@ local insert_path = function(prompt_bufnr, close, location, vim_mode)
   --print(vim.inspect(picker._selection_entry))
   local entry = action_state.get_selected_entry(prompt_bufnr)
   local filename = entry.value
+  if not relative then
   -- fnamemodify with :p appends a trailing slash to directories
-  local filepath = vim.fn.fnamemodify(entry.cwd, ':p') .. filename
-
-  if location ~= nil then
-    vim.cmd([[normal! ]] .. location)
+    filename = vim.fn.fnamemodify(entry.cwd, ':p') .. filename
   end
 
-  vim.api.nvim_put({ filepath }, "", true, true)
+  -- normal mode
+  vim.cmd [[stopinsert]]
 
-  if vim_mode == "n" then
-    vim.cmd [[stopinsert]]
-  elseif vim_mode == "i" then
-    vim.cmd [[startinsert!]]  -- put the cursor after the inserted text (!)
+  local put_after = nil
+  if location == 'i' then
+    put_after = false
+  elseif location == 'I' then
+    vim.cmd([[normal! I]])
+    put_after = false
+  elseif location == 'a' then
+    put_after = true
+  elseif location == 'A' then
+    vim.cmd([[normal! $]])
+    put_after = true
+  elseif location == 'o' then
+    vim.cmd([[normal! o ]])   -- add empty space so the cursor respects the indent
+    vim.cmd([[normal! x]])   -- and immediately delete it
+    put_after = true 
+  elseif location == 'O' then
+    vim.cmd([[normal! O ]])
+    vim.cmd([[normal! x]])
+    put_after = true 
+  end
+
+  -- put 1 character
+  vim.api.nvim_put({ filename:sub(1,1) }, "", put_after, true)
+  -- check if we're putting at the end of line or there's a trailing content after.
+  local line_col_len = vim.api.nvim_get_current_line():len()
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+  local trailing_content = false
+  if cursor_pos[2] ~= line_col_len-1 then
+    trailing_content = true
+  end
+
+  if trailing_content then
+    vim.cmd([[normal! h]])
+  end
+
+  if vim_mode == 'v' then
+    -- enter visual mode
+    vim.cmd([[normal! v]])
+  end
+
+  -- put the rest of the filename
+  if filename:len() > 1 then
+    vim.api.nvim_put({ filename:sub(2) }, "", true, true)
   else
-    -- unchanged
+    -- make the cursor consistent
+    if trailing_content then
+      vim.cmd([[normal! l]])
+    end
+  end
+
+  if vim_mode == 'v' or vim_mode == 'n' then
+    -- go back 1 if the line was not empty because we're selecting that character.
+    if trailing_content then
+      vim.cmd([[normal! h]])
+    end
+  elseif vim_mode == 'i' then
+    if trailing_content then
+      vim.cmd [[startinsert]]
+    else
+      vim.cmd [[startinsert!]]
+    end
   end
 end
 
-path_actions.insert_path_i = function(prompt_bufnr)
-  return insert_path(prompt_bufnr, true, "i", nil)
+-- insert mode mappings
+path_actions.insert_abspath_i_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "i", "i")
 end
 
-path_actions.insert_path_I = function(prompt_bufnr)
-  return insert_path(prompt_bufnr, true, "I", nil)
+path_actions.insert_abspath_I_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "I", "i")
 end
 
-path_actions.insert_path_a = function(prompt_bufnr)
-  return insert_path(prompt_bufnr, true, "a", nil)
+path_actions.insert_abspath_a_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "a", "i")
 end
 
-path_actions.insert_path_A = function(prompt_bufnr)
-  return insert_path(prompt_bufnr, true, "A", nil)
+path_actions.insert_abspath_A_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "A", "i")
 end
 
-path_actions.insert_path_o = function(prompt_bufnr)
-  return insert_path(prompt_bufnr, true, "o", nil)
+path_actions.insert_abspath_o_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "o", "i")
 end
 
-path_actions.insert_path_O = function(prompt_bufnr)
-  return insert_path(prompt_bufnr, true, "O", nil)
+path_actions.insert_abspath_O_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "O", "i")
+end
+
+path_actions.insert_relpath_i_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "i", "i")
+end
+
+path_actions.insert_relpath_I_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "I", "i")
+end
+
+path_actions.insert_relpath_a_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "a", "i")
+end
+
+path_actions.insert_relpath_A_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "A", "i")
+end
+
+path_actions.insert_relpath_o_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "o", "i")
+end
+
+path_actions.insert_relpath_O_insert = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "O", "i")
+end
+
+-- normal mode mappings
+path_actions.insert_abspath_i_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "i", "n")
+end
+
+path_actions.insert_abspath_I_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "I", "n")
+end
+
+path_actions.insert_abspath_a_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "a", "n")
+end
+
+path_actions.insert_abspath_A_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "A", "n")
+end
+
+path_actions.insert_abspath_o_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "o", "n")
+end
+
+path_actions.insert_abspath_O_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "O", "n")
+end
+
+path_actions.insert_relpath_i_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "i", "n")
+end
+
+path_actions.insert_relpath_I_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "I", "n")
+end
+
+path_actions.insert_relpath_a_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "a", "n")
+end
+
+path_actions.insert_relpath_A_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "A", "n")
+end
+
+path_actions.insert_relpath_o_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "o", "n")
+end
+
+path_actions.insert_relpath_O_normal = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "O", "n")
+end
+
+-- visual mode mappings
+path_actions.insert_abspath_i_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "i", "v")
+end
+
+path_actions.insert_abspath_I_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "I", "v")
+end
+
+path_actions.insert_abspath_a_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "a", "v")
+end
+
+path_actions.insert_abspath_A_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "A", "v")
+end
+
+path_actions.insert_abspath_o_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "o", "v")
+end
+
+path_actions.insert_abspath_O_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, false, "O", "v")
+end
+
+path_actions.insert_relpath_i_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "i", "v")
+end
+
+path_actions.insert_relpath_I_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "I", "v")
+end
+
+path_actions.insert_relpath_a_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "a", "v")
+end
+
+path_actions.insert_relpath_A_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "A", "v")
+end
+
+path_actions.insert_relpath_o_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "o", "v")
+end
+
+path_actions.insert_relpath_O_visual = function(prompt_bufnr)
+  return insert_path(prompt_bufnr, true, "O", "v")
 end
 
 return path_actions
