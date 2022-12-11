@@ -2,6 +2,8 @@
 
 Set of [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) actions to insert file path on the current buffer.
 
+<img src="https://user-images.githubusercontent.com/12980409/206919320-aa0d9b79-771e-4560-9cb3-9787d1c6460f.gif" width="100%"/>
+
 ### Supported Path Types
 - Absolute path
 - Relative path
