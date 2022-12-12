@@ -49,21 +49,24 @@ require('telescope').setup {
   defaults = {
     mappings = {
       n = {
-        ["pi"] = path_actions.insert_relpath_i_visual,
-        ["pI"] = path_actions.insert_relpath_I_visual,
-        ["pa"] = path_actions.insert_relpath_a_visual,
-        ["pA"] = path_actions.insert_relpath_A_visual,
-        ["po"] = path_actions.insert_relpath_o_visual,
-        ["pO"] = path_actions.insert_relpath_O_visual,
-        ["Pi"] = path_actions.insert_abspath_i_visual,
-        ["PI"] = path_actions.insert_abspath_I_visual,
-        ["Pa"] = path_actions.insert_abspath_a_visual,
-        ["PA"] = path_actions.insert_abspath_A_visual,
-        ["Po"] = path_actions.insert_abspath_o_visual,
-        ["PO"] = path_actions.insert_abspath_O_visual,
+        ["[i"] = path_actions.insert_relpath_i_visual,
+        ["[I"] = path_actions.insert_relpath_I_visual,
+        ["[a"] = path_actions.insert_relpath_a_visual,
+        ["[A"] = path_actions.insert_relpath_A_visual,
+        ["[o"] = path_actions.insert_relpath_o_visual,
+        ["[O"] = path_actions.insert_relpath_O_visual,
+        ["]i"] = path_actions.insert_abspath_i_visual,
+        ["]I"] = path_actions.insert_abspath_I_visual,
+        ["]a"] = path_actions.insert_abspath_a_visual,
+        ["]A"] = path_actions.insert_abspath_A_visual,
+        ["]o"] = path_actions.insert_abspath_o_visual,
+        ["]O"] = path_actions.insert_abspath_O_visual,
         -- Additionally, there's insert and normal mode mappings for the same actions:
-        -- ["<leader>pi"] = path_actions.insert_relpath_i_insert,
-        -- ["<leader><leader>pi"] = path_actions.insert_relpath_i_normal,
+        -- ["{i"] = path_actions.insert_relpath_i_insert,
+        -- ["{I"] = path_actions.insert_relpath_I_insert,
+        -- ...
+        -- ["-i"] = path_actions.insert_relpath_i_normal,
+        -- ["-I"] = path_actions.insert_relpath_I_visual,
         -- ...
       }
     }
