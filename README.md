@@ -6,7 +6,8 @@ Set of [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) action
 
 ### Supported Path Types
 - Absolute path
-- Relative path
+- Relative path (to current working directory)
+- Realtive path (to buffer file)
 
 ### Supported Insert Locations
 - `i`: before cursor
@@ -68,6 +69,8 @@ require('telescope').setup {
         -- ["-i"] = path_actions.insert_relpath_i_normal,
         -- ["-I"] = path_actions.insert_relpath_I_visual,
         -- ...
+		-- If you want to get relative path that is relative to the file path, use
+		-- `reltobufpath` instead of `relpath`
       }
     }
   }
