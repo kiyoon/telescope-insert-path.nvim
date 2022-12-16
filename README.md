@@ -69,8 +69,8 @@ require('telescope').setup {
         -- ["-i"] = path_actions.insert_relpath_i_normal,
         -- ["-I"] = path_actions.insert_relpath_I_visual,
         -- ...
-		-- If you want to get relative path that is relative to the file path, use
-		-- `reltobufpath` instead of `relpath`
+	-- If you want to get relative path that is relative to the file path, use
+	-- `reltobufpath` instead of `relpath`
       }
     }
   }
