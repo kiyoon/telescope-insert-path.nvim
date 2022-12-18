@@ -7,7 +7,7 @@ Set of [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) action
 ### Supported Path Types
 - Absolute path
 - Relative path (to current working directory)
-- Realtive path (to buffer file)
+- Relative path (to buffer file)
 
 ### Supported Insert Locations
 - `i`: before cursor
