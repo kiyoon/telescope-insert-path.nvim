@@ -113,43 +113,38 @@ local function insert_path(prompt_bufnr, relative, location, vim_mode)
 		put_after = true
 	end
 
-	-- put 1 character
-	vim.api.nvim_put({ filename:sub(1, 1) }, "", put_after, true)
-	-- check if we're putting at the end of line or there's a trailing content after.
-	local line_col_len = vim.api.nvim_get_current_line():len()
-	local cursor_pos = vim.api.nvim_win_get_cursor(0)
-	local trailing_content = false
-	if cursor_pos[2] ~= line_col_len - 1 then
-		trailing_content = true
-	end
-
-	if trailing_content then
-		vim.cmd([[normal! h]])
-	end
-
 	local cursor_pos_visual_start = vim.api.nvim_win_get_cursor(0)
 
-	-- put the rest of the filename
-	if filename:len() > 1 then
-		vim.api.nvim_put({ filename:sub(2) }, "", true, true)
-		if trailing_content then
-			vim.cmd([[normal! h]])
-		end
+	-- if you use nvim_put it's hard to know the range of the new text.
+	-- vim.api.nvim_put({ filename }, "", put_after, true)
+	local line = vim.api.nvim_get_current_line()
+	local new_line
+	if put_after then
+		local text_before = line:sub(1, cursor_pos_visual_start[2] + 1)
+		new_line = text_before .. filename .. line:sub(cursor_pos_visual_start[2] + 2)
+		cursor_pos_visual_start[2] = text_before:len()
+	else
+		local text_before = line:sub(1, cursor_pos_visual_start[2])
+		new_line = text_before .. filename .. line:sub(cursor_pos_visual_start[2] + 1)
+		cursor_pos_visual_start[2] = text_before:len()
 	end
+	vim.api.nvim_set_current_line(new_line)
 
-	-- put the selections
+	local cursor_pos_visual_end
+
+	-- put the multi-selections
 	if #selections > 0 then
 		-- start with empty line
-		table.insert(selections, 1, "")
-		vim.api.nvim_put(selections, "", true, true)
-	else
-		-- make the cursor consistent
-		if trailing_content then
-			vim.cmd([[normal! l]])
+		-- table.insert(selections, 1, "")
+		for _, selection in ipairs(selections) do
+			vim.cmd([[normal! o ]]) -- add empty space so the cursor respects the indent
+			vim.cmd([[normal! x]]) -- and immediately delete it
+			vim.api.nvim_put({ selection }, "", true, true)
 		end
+		cursor_pos_visual_end = vim.api.nvim_win_get_cursor(0)
+	else
+		cursor_pos_visual_end = { cursor_pos_visual_start[1], cursor_pos_visual_start[2] + filename:len() - 1 }
 	end
-
-	local cursor_pos_visual_end = vim.api.nvim_win_get_cursor(0)
 
 	if vim_mode == "v" then
 		-- There is a weird artefact if we go into visual mode before putting text. #1
@@ -157,19 +152,13 @@ local function insert_path(prompt_bufnr, relative, location, vim_mode)
 		vim.api.nvim_win_set_cursor(0, cursor_pos_visual_start)
 		vim.cmd([[normal! v]])
 		vim.api.nvim_win_set_cursor(0, cursor_pos_visual_end)
-	end
-
-	if vim_mode == "v" or vim_mode == "n" then
-		-- go back 1 if the line was not empty because we're selecting that character.
-		if trailing_content then
-			vim.cmd([[normal! h]])
-		end
+	elseif vim_mode == "n" then
+		vim.api.nvim_win_set_cursor(0, cursor_pos_visual_end)
 	elseif vim_mode == "i" then
-		if trailing_content then
-			vim.cmd([[startinsert]])
-		else
-			vim.cmd([[startinsert!]])
-		end
+		vim.api.nvim_win_set_cursor(0, cursor_pos_visual_end)
+		-- append like 'a'
+		vim.cmd([[startinsert]])
+		vim.cmd([[call cursor( line('.'), col('.') + 1)]])
 	end
 end
 
