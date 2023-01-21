@@ -70,6 +70,28 @@ local function get_path_from_entry(entry, relative)
 end
 
 local function insert_path(prompt_bufnr, relative, location, vim_mode)
+	if
+		location ~= "i"
+		and location ~= "I"
+		and location ~= "a"
+		and location ~= "A"
+		and location ~= "o"
+		and location ~= "O"
+	then
+		location = vim.fn.nr2char(vim.fn.getchar())
+		if
+			location ~= "i"
+			and location ~= "I"
+			and location ~= "a"
+			and location ~= "A"
+			and location ~= "o"
+			and location ~= "O"
+		then
+			-- escape
+			return nil
+		end
+	end
+
 	local picker = action_state.get_current_picker(prompt_bufnr)
 
 	actions.close(prompt_bufnr)
@@ -379,6 +401,44 @@ end
 
 path_actions.insert_reltobufpath_O_visual = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "buf", "O", "v")
+end
+
+-- Generic actions
+-- Get location input from the user (i, I, a, A, o, O)
+path_actions.insert_reltobufpath_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "buf", nil, "v")
+end
+
+path_actions.insert_relpath_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "cwd", nil, "v")
+end
+
+path_actions.insert_abspath_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "abs", nil, "v")
+end
+
+path_actions.insert_reltobufpath_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "buf", nil, "n")
+end
+
+path_actions.insert_relpath_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "cwd", nil, "n")
+end
+
+path_actions.insert_abspath_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "abs", nil, "n")
+end
+
+path_actions.insert_reltobufpath_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "buf", nil, "i")
+end
+
+path_actions.insert_relpath_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "cwd", nil, "i")
+end
+
+path_actions.insert_abspath_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "abs", nil, "i")
 end
 
 return path_actions
