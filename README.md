@@ -48,9 +48,7 @@ use {'kiyoon/telescope-insert-path.nvim'}
 
 Setup telescope with path actions in vimscript / lua:
 
-```vim
-" For lua users, delete the first and the last line.
-lua << EOF
+```lua
 local path_actions = require('telescope_insert_path')
 
 require('telescope').setup {
@@ -73,5 +71,4 @@ require('telescope').setup {
     }
   }
 }
-EOF
 ```
