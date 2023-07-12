@@ -9,6 +9,15 @@ Set of [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) action
 - Absolute path
 - Relative path (to current working directory)
 - Relative path (to buffer file)
+- Relative to git root
+- Relative to custom source direcotry
+
+### Custom source directory
+The custom source directory can be set using the method `require('telescope_insert_path').set_source_dir()`.
+
+A default custom source directory can be set using the global option `telescope_insert_path_source_dir`. 
+In the case this option is set and present in the root of the project (git root or cwd) this will be used, 
+if the value does not exists or it's not a directory the root of the project will be used as default.
 
 ### Supported Insert Locations
 
