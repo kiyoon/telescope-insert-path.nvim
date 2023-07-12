@@ -32,16 +32,26 @@ local function get_git_root()
     if ret then return trim(output) else return vim.fn.getcwd() end
 end
 
-local function set_source_dir()
+local function get_git_root_or_cwd()
+    local root = get_git_root()
+    
+    if not root then
+        return vim.fn.getcwd()
+    end
 
+    return root
+end
+
+function set_source_dir()
     local root = get_git_root()
 
     if not root then root = vim.fn.getcwd() end
 
-    path_actions.source_dir = vim.fn.input("insert source directory: " ~ root ~ "/", "", "dir")
+    path_actions.source_dir = root .. '/' .. vim.fn.input("insert source directory: " .. root .. "/", "", "dir")
 end
 
 vim.api.nvim_create_user_command('SetPathActionSourceDir', ':lua set_source_dir()<CR>', {nargs=0})
+
 
 -- given a file path and a dir, return relative path of the file to a given dir
 local function get_relative_path(file, dir)
@@ -51,7 +61,7 @@ local function get_relative_path(file, dir)
 	if string.ends(absdir, "/") then
 		absdir = absdir:sub(1, -2)
 	else
-		error("dir is not a directory")
+		error("dir (" .. dir .. ") is not a directory")
 	end
 	local num_parents = 0
 	local absolute_path = false
@@ -217,6 +227,9 @@ local function insert_path(prompt_bufnr, relative, location, vim_mode)
 	end
 end
 
+-- source dir
+path_actions.source_dir = get_git_root_or_cwd()
+
 -- insert mode mappings
 path_actions.insert_abspath_i_insert = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", "i", "i")
@@ -290,6 +303,49 @@ path_actions.insert_reltobufpath_O_insert = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "buf", "O", "i")
 end
 
+path_actions.insert_relgit_I_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "I", "i")
+end
+
+path_actions.insert_relgit_a_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "a", "i")
+end
+
+path_actions.insert_relgit_A_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "A", "i")
+end
+
+path_actions.insert_relgit_o_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "o", "i")
+end
+
+path_actions.insert_relgit_O_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "O", "i")
+end
+
+path_actions.insert_relsource_i_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "i", "i")
+end
+
+path_actions.insert_relsource_I_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "I", "i")
+end
+
+path_actions.insert_relsource_a_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "a", "i")
+end
+
+path_actions.insert_relsource_A_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "A", "i")
+end
+
+path_actions.insert_relsource_o_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "o", "i")
+end
+
+path_actions.insert_relsource_O_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "O", "i")
+end
 -- normal mode mappings
 path_actions.insert_abspath_i_normal = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", "i", "n")
