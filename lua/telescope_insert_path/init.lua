@@ -42,17 +42,6 @@ local function get_git_root_or_cwd()
     return root
 end
 
-function set_source_dir()
-    local root = get_git_root()
-
-    if not root then root = vim.fn.getcwd() end
-
-    path_actions.source_dir = root .. '/' .. vim.fn.input("insert source directory: " .. root .. "/", "", "dir")
-end
-
-vim.api.nvim_create_user_command('SetPathActionSourceDir', ':lua set_source_dir()<CR>', {nargs=0})
-
-
 -- given a file path and a dir, return relative path of the file to a given dir
 local function get_relative_path(file, dir)
 	local absfile = vim.fn.fnamemodify(file, ":p")
@@ -227,8 +216,54 @@ local function insert_path(prompt_bufnr, relative, location, vim_mode)
 	end
 end
 
--- source dir
-path_actions.source_dir = get_git_root_or_cwd()
+--- Check if a file or directory exists in this path
+local function exists(file)
+   local ok, err, code = os.rename(file, file)
+   if not ok then
+      if code == 13 then
+         -- Permission denied, but it exists
+         return true
+      end
+   end
+   return ok, err
+end
+
+--- Check if a directory exists in this path
+local function isdir(path)
+   -- "/" works on both Unix and Windows
+   return exists(path.."/")
+end
+
+local function get_default_source_dir()
+    local source = ''
+
+    if vim.g.telescope_insert_path_source_dir then
+        source = get_git_root_or_cwd() .. "/" .. vim.g.telescope_insert_path_source_dir
+    else
+        source = get_git_root_or_cwd()
+    end
+
+    if isdir(source) then
+        return source
+    else
+        return get_git_root_or_cwd()
+    end
+end
+
+-- source_dir
+path_actions.set_source_dir = function(dir)
+    if dir then
+        path_actions.source_dir = dir
+    else
+        local root = get_git_root()
+
+        if not root then root = vim.fn.getcwd() end
+
+        path_actions.source_dir = root .. '/' .. vim.fn.input("insert source directory: " .. root .. "/", "", "dir")
+    end
+end
+
+path_actions.source_dir = get_default_source_dir()
 
 -- insert mode mappings
 path_actions.insert_abspath_i_insert = function(prompt_bufnr)
