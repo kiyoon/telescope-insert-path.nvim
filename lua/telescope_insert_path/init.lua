@@ -20,6 +20,18 @@ function string.ends(String, End)
 	return End == "" or string.sub(String, -string.len(End)) == End
 end
 
+-- returns the git root of the project or the cwd
+local function get_git_root_or_cwd()
+    local handler = io.popen('git rev-parse --show-toplevel')
+
+    if not handler then return nil end
+
+    local output = handler:read('*a')
+    local ret = handler:close()
+
+    if ret then return trim(output) else return vim.fn.getcwd() end
+end
+
 -- given a file path and a dir, return relative path of the file to a given dir
 local function get_relative_path(file, dir)
 	local absfile = vim.fn.fnamemodify(file, ":p")
@@ -62,6 +74,14 @@ local function get_path_from_entry(entry, relative)
 	elseif relative == "cwd" then
 		-- path relative to current working directory
 		filename = entry.filename
+    elseif relative == "git" then
+        local git_root = get_git_root()
+
+        if not git_root then
+            error("can't get git root")
+        end
+
+        filename = get_relative_path(entry.path, git_root)
 	else
 		-- absolute path
 		filename = entry.path
