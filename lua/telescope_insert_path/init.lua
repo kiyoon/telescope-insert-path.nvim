@@ -350,6 +350,30 @@ path_actions.insert_reltobufpath_O_normal = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "buf", "O", "n")
 end
 
+path_actions.insert_relgit_i_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "i", "n")
+end
+
+path_actions.insert_relgit_I_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "I", "n")
+end
+
+path_actions.insert_relgit_a_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "a", "n")
+end
+
+path_actions.insert_relgit_A_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "A", "n")
+end
+
+path_actions.insert_relgit_o_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "o", "n")
+end
+
+path_actions.insert_relgit_O_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "O", "n")
+end
+
 -- visual mode mappings
 path_actions.insert_abspath_i_visual = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", "i", "v")
@@ -421,6 +445,30 @@ end
 
 path_actions.insert_reltobufpath_O_visual = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "buf", "O", "v")
+end
+
+path_actions.insert_relgit_i_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "i", "v")
+end
+
+path_actions.insert_relgit_I_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "I", "v")
+end
+
+path_actions.insert_relgit_a_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "a", "v")
+end
+
+path_actions.insert_relgit_A_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "A", "v")
+end
+
+path_actions.insert_relgit_o_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "o", "v")
+end
+
+path_actions.insert_relgit_O_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", "O", "v")
 end
 
 -- Generic actions
