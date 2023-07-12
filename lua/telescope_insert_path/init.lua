@@ -21,7 +21,7 @@ function string.ends(String, End)
 end
 
 -- returns the git root of the project or the cwd
-local function get_git_root_or_cwd()
+local function get_git_root()
     local handler = io.popen('git rev-parse --show-toplevel')
 
     if not handler then return nil end
@@ -31,6 +31,17 @@ local function get_git_root_or_cwd()
 
     if ret then return trim(output) else return vim.fn.getcwd() end
 end
+
+local function set_source_dir()
+
+    local root = get_git_root()
+
+    if not root then root = vim.fn.getcwd() end
+
+    path_actions.source_dir = vim.fn.input("insert source directory: " ~ root ~ "/", "", "dir")
+end
+
+vim.api.nvim_create_user_command('SetPathActionSourceDir', ':lua set_source_dir()<CR>', {nargs=0})
 
 -- given a file path and a dir, return relative path of the file to a given dir
 local function get_relative_path(file, dir)
@@ -82,6 +93,8 @@ local function get_path_from_entry(entry, relative)
         end
 
         filename = get_relative_path(entry.path, git_root)
+    elseif relative == "source" then
+        filename = get_relative_path(entry.path, path_actions.source_dir)
 	else
 		-- absolute path
 		filename = entry.path
@@ -374,6 +387,30 @@ path_actions.insert_relgit_O_normal = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "git", "O", "n")
 end
 
+path_actions.insert_relsource_i_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "i", "n")
+end
+
+path_actions.insert_relsource_I_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "I", "n")
+end
+
+path_actions.insert_relsource_a_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "a", "n")
+end
+
+path_actions.insert_relsource_A_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "A", "n")
+end
+
+path_actions.insert_relsource_o_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "o", "n")
+end
+
+path_actions.insert_relsource_O_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "O", "n")
+end
+
 -- visual mode mappings
 path_actions.insert_abspath_i_visual = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", "i", "v")
@@ -469,6 +506,30 @@ end
 
 path_actions.insert_relgit_O_visual = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "git", "O", "v")
+end
+
+path_actions.insert_relsource_i_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "i", "v")
+end
+
+path_actions.insert_relsource_I_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "I", "v")
+end
+
+path_actions.insert_relsource_a_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "a", "v")
+end
+
+path_actions.insert_relsource_A_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "A", "v")
+end
+
+path_actions.insert_relsource_o_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "o", "v")
+end
+
+path_actions.insert_relsource_O_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", "O", "v")
 end
 
 -- Generic actions
