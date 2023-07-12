@@ -637,6 +637,14 @@ path_actions.insert_abspath_visual = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", nil, "v")
 end
 
+path_actions.insert_relgit_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", nil, "v")
+end
+
+path_actions.insert_relsource_visual = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", nil, "v")
+end
+
 path_actions.insert_reltobufpath_normal = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "buf", nil, "n")
 end
@@ -649,6 +657,14 @@ path_actions.insert_abspath_normal = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", nil, "n")
 end
 
+path_actions.insert_relgit_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", nil, "n")
+end
+
+path_actions.insert_relsource_normal = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", nil, "n")
+end
+
 path_actions.insert_reltobufpath_insert = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "buf", nil, "i")
 end
@@ -659,6 +675,14 @@ end
 
 path_actions.insert_abspath_insert = function(prompt_bufnr)
 	return insert_path(prompt_bufnr, "abs", nil, "i")
+end
+
+path_actions.insert_relgit_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "git", nil, "i")
+end
+
+path_actions.insert_relsource_insert = function(prompt_bufnr)
+	return insert_path(prompt_bufnr, "source", nil, "i")
 end
 
 return path_actions
