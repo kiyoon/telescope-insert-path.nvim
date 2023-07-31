@@ -26,7 +26,7 @@ local function get_git_root()
   local rescode = vim.v.shell_error
 
   if rescode == 0 then
-    return trim(output)
+    return vim.fn.trim(output)
   end
 
   -- in this case git command failed
