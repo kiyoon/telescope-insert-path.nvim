@@ -97,48 +97,7 @@ local function get_path_from_entry(entry, relative)
   return filename
 end
 
-local function insert_path(prompt_bufnr, relative, location, vim_mode)
-  if
-    location ~= "i"
-    and location ~= "I"
-    and location ~= "a"
-    and location ~= "A"
-    and location ~= "o"
-    and location ~= "O"
-  then
-    location = vim.fn.nr2char(vim.fn.getchar())
-    if
-      location ~= "i"
-      and location ~= "I"
-      and location ~= "a"
-      and location ~= "A"
-      and location ~= "o"
-      and location ~= "O"
-    then
-      -- escape
-      return nil
-    end
-  end
-
-  local picker = action_state.get_current_picker(prompt_bufnr)
-
-  actions.close(prompt_bufnr)
-
-  local entry = action_state.get_selected_entry(prompt_bufnr)
-
-  -- local from_entry = require "telescope.from_entry"
-  -- local filename = from_entry.path(entry)
-  local filename = get_path_from_entry(entry, relative)
-
-  local selections = {}
-  for _, selection in ipairs(picker:get_multi_selection()) do
-    local selection_filename = get_path_from_entry(selection, relative)
-
-    if selection_filename ~= filename then
-      table.insert(selections, selection_filename)
-    end
-  end
-
+local function _insert_path(location, vim_mode, filename, selections)
   -- normal mode
   vim.cmd [[stopinsert]]
 
@@ -184,8 +143,6 @@ local function insert_path(prompt_bufnr, relative, location, vim_mode)
 
   -- put the multi-selections
   if #selections > 0 then
-    -- start with empty line
-    -- table.insert(selections, 1, "")
     for _, selection in ipairs(selections) do
       vim.cmd [[normal! o ]] -- add empty space so the cursor respects the indent
       vim.cmd [[normal! x]] -- and immediately delete it
@@ -210,6 +167,49 @@ local function insert_path(prompt_bufnr, relative, location, vim_mode)
     vim.cmd [[startinsert]]
     vim.cmd [[call cursor( line('.'), col('.') + 1)]]
   end
+end
+
+local function insert_path(prompt_bufnr, relative, location, vim_mode)
+  if
+    location ~= "i"
+    and location ~= "I"
+    and location ~= "a"
+    and location ~= "A"
+    and location ~= "o"
+    and location ~= "O"
+  then
+    location = vim.fn.getcharstr()
+    if
+      location ~= "i"
+      and location ~= "I"
+      and location ~= "a"
+      and location ~= "A"
+      and location ~= "o"
+      and location ~= "O"
+    then
+      -- escape
+      return nil
+    end
+  end
+
+  local picker = action_state.get_current_picker(prompt_bufnr)
+
+  actions.close(prompt_bufnr)
+
+  local entry = action_state.get_selected_entry(prompt_bufnr)
+
+  local filename = get_path_from_entry(entry, relative)
+
+  local selections = {}
+  for _, selection in ipairs(picker:get_multi_selection()) do
+    local selection_filename = get_path_from_entry(selection, relative)
+
+    if selection_filename ~= filename then
+      table.insert(selections, selection_filename)
+    end
+  end
+
+  vim.schedule(function() _insert_path(location, vim_mode, filename, selections) end)
 end
 
 --- Check if a file or directory exists in this path
